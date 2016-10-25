@@ -30,16 +30,13 @@ import (
 	"github.com/golang/glog"
 
 	// TODO get rid of this and use https://github.com/kubernetes/kubernetes/pull/32718
-	"github.com/wongma7/nfs-provisioner/framework"
-	"k8s.io/client-go/1.4/kubernetes"
-	core_v1 "k8s.io/client-go/1.4/kubernetes/typed/core/v1"
-	"k8s.io/client-go/1.4/pkg/api"
-	"k8s.io/client-go/1.4/pkg/api/v1"
-	"k8s.io/client-go/1.4/pkg/apis/storage/v1beta1"
-	"k8s.io/client-go/1.4/pkg/runtime"
-	"k8s.io/client-go/1.4/pkg/watch"
-	"k8s.io/client-go/1.4/tools/cache"
-	"k8s.io/client-go/1.4/tools/record"
+	"k8s.io/client-go/kubernetes"
+	core_v1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/client-go/pkg/api/v1"
+	"k8s.io/client-go/pkg/apis/storage/v1beta1"
+	"k8s.io/client-go/pkg/fields"
+	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/tools/record"
 
 	"k8s.io/kubernetes/pkg/util/goroutinemap"
 )
@@ -85,9 +82,9 @@ type ProvisionController struct {
 	provisioner Provisioner
 
 	claimSource      cache.ListerWatcher
-	claimController  *framework.Controller
+	claimController  *cache.Controller
 	volumeSource     cache.ListerWatcher
-	volumeController *framework.Controller
+	volumeController *cache.Controller
 	classSource      cache.ListerWatcher
 	classReflector   *cache.Reflector
 
@@ -131,53 +128,32 @@ func NewProvisionController(
 		createProvisionedPVInterval:   createProvisionedPVInterval,
 	}
 
-	controller.claimSource = &cache.ListWatch{
-		ListFunc: func(options api.ListOptions) (runtime.Object, error) {
-			return client.Core().PersistentVolumeClaims(v1.NamespaceAll).List(options)
-		},
-		WatchFunc: func(options api.ListOptions) (watch.Interface, error) {
-			return client.Core().PersistentVolumeClaims(v1.NamespaceAll).Watch(options)
-		},
-	}
-	controller.claims, controller.claimController = framework.NewInformer(
+	controller.claimSource = cache.NewListWatchFromClient(client.Core().GetRESTClient(), "persistentvolumeclaims", v1.NamespaceAll, fields.Everything())
+	controller.claims, controller.claimController = cache.NewInformer(
 		controller.claimSource,
 		&v1.PersistentVolumeClaim{},
 		resyncPeriod,
-		framework.ResourceEventHandlerFuncs{
+		cache.ResourceEventHandlerFuncs{
 			AddFunc:    controller.addClaim,
 			UpdateFunc: controller.updateClaim,
 			DeleteFunc: nil,
 		},
 	)
 
-	controller.volumeSource = &cache.ListWatch{
-		ListFunc: func(options api.ListOptions) (runtime.Object, error) {
-			return client.Core().PersistentVolumes().List(options)
-		},
-		WatchFunc: func(options api.ListOptions) (watch.Interface, error) {
-			return client.Core().PersistentVolumes().Watch(options)
-		},
-	}
-	controller.volumes, controller.volumeController = framework.NewInformer(
+	controller.volumeSource = cache.NewListWatchFromClient(client.Core().GetRESTClient(), "persistentvolumes", v1.NamespaceAll, fields.Everything())
+	controller.volumes, controller.volumeController = cache.NewInformer(
 		controller.volumeSource,
 		&v1.PersistentVolume{},
 		resyncPeriod,
-		framework.ResourceEventHandlerFuncs{
+		cache.ResourceEventHandlerFuncs{
 			AddFunc:    nil,
 			UpdateFunc: controller.updateVolume,
 			DeleteFunc: nil,
 		},
 	)
 
-	controller.classSource = &cache.ListWatch{
-		ListFunc: func(options api.ListOptions) (runtime.Object, error) {
-			return client.Storage().StorageClasses().List(options)
-		},
-		WatchFunc: func(options api.ListOptions) (watch.Interface, error) {
-			return client.Storage().StorageClasses().Watch(options)
-		},
-	}
-	controller.classes = cache.NewStore(framework.DeletionHandlingMetaNamespaceKeyFunc)
+	controller.classSource = cache.NewListWatchFromClient(client.Storage().GetRESTClient(), "storageclasses", v1.NamespaceAll, fields.Everything())
+	controller.classes = cache.NewStore(cache.DeletionHandlingMetaNamespaceKeyFunc)
 	controller.classReflector = cache.NewReflector(
 		controller.classSource,
 		&v1beta1.StorageClass{},

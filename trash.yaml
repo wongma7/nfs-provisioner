@@ -14,11 +14,10 @@ github.com/google/gofuzz	fd52762
 github.com/guelfey/go.dbus	f6a3a23
 github.com/imdario/mergo	0.2.2-6-g50d4dbd
 github.com/juju/ratelimit	77ed1c8
-github.com/openshift/origin	v1.4.0-alpha.0-437-g6b0457c
 github.com/pborman/uuid	v1.0-17-g3d4f2ba
 github.com/spf13/pflag	bf8481a
 github.com/ugorji/go	faddd61
 golang.org/x/net	8b4af36
 gopkg.in/inf.v0	v0.9.0
-k8s.io/client-go	f8e519f
+k8s.io/client-go	4050de6
 k8s.io/kubernetes	v1.5.0-alpha.0-2383-gdd529f3

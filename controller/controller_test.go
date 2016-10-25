@@ -22,15 +22,15 @@ import (
 	"testing"
 	"time"
 
-	"k8s.io/client-go/1.4/kubernetes/fake"
-	"k8s.io/client-go/1.4/pkg/api"
-	"k8s.io/client-go/1.4/pkg/api/resource"
-	"k8s.io/client-go/1.4/pkg/api/testapi"
-	"k8s.io/client-go/1.4/pkg/api/v1"
-	"k8s.io/client-go/1.4/pkg/apis/storage/v1beta1"
-	"k8s.io/client-go/1.4/pkg/runtime"
-	"k8s.io/client-go/1.4/pkg/types"
-	testclient "k8s.io/client-go/1.4/testing"
+	"k8s.io/client-go/kubernetes/fake"
+	"k8s.io/client-go/pkg/api"
+	"k8s.io/client-go/pkg/api/resource"
+	"k8s.io/client-go/pkg/api/testapi"
+	"k8s.io/client-go/pkg/api/v1"
+	"k8s.io/client-go/pkg/apis/storage/v1beta1"
+	"k8s.io/client-go/pkg/runtime"
+	"k8s.io/client-go/pkg/types"
+	testclient "k8s.io/client-go/testing"
 )
 
 func TestController(t *testing.T) {
