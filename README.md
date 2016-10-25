@@ -1,5 +1,4 @@
-# nfs-provisioner
-[![Build Status](https://travis-ci.org/wongma7/nfs-provisioner.svg?branch=master)](https://travis-ci.org/wongma7/nfs-provisioner)
+# nfs-provisioner [![Build Status](https://travis-ci.org/wongma7/nfs-provisioner.svg?branch=master)](https://travis-ci.org/wongma7/nfs-provisioner)
 
 nfs-provisioner is an out-of-tree dynamic provisioner for Kubernetes 1.4. You can use it to quickly & easily deploy shared storage that works almost anywhere. Or it can help you write your own out-of-tree dynamic provisioner by serving as an example implementation of the requirements detailed in [the proposal](https://github.com/kubernetes/kubernetes/pull/30285).
 
@@ -39,6 +38,9 @@ To deploy nfs-provisioner on a Kubernetes cluster see [Deployment](docs/deployme
 To use nfs-provisioner once it is deployed see [Usage](docs/usage.md).
 
 For information on running multiple instances of nfs-provisioner see [Running Multiple Provisioners](docs/multiple.md).
+
+## Building
+Clone 
 
 ## Implementation 
 The controller, the code for which is in the `controller/` directory, watches PVCs and PVs to determine when to provision or delete volumes. It expects to receive an implementation of the `Provisioner` interface which has two methods: `Provision` and `Delete`. This NFS provisioner's implementation of the interface can be found under the `volume/` directory.
